@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updates - Sahabat KTB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1><a href="index.html" class="site-title">Sahabat KTB</a></h1>
+                <div class="user-info">
+                    <span id="user-name"></span>
+                    <button class="btn-logout" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Home</span>
+                </a>
+                <a href="guidelines.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Guidelines</span>
+                </a>
+                <a href="updates.html" class="nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Updates</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>&copy; 2025 Sahabat KTB.<br>All rights reserved.<br>Created by Pacifora Group.</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="updates-header">
+                <h2>Website Updates</h2>
+                <p class="updates-subtitle">Latest changes and improvements to Sahabat KTB</p>
+            </div>
+
+            <div class="updates-timeline">
+                <div class="update-item">
+                    <div class="update-date">October 12, 2025</div>
+                    <div class="update-card">
+                        <h3>🎨 Major UI Improvements</h3>
+                        <ul>
+                            <li>Added sidebar navigation for easier browsing</li>
+                            <li>Improved reply section with better visual hierarchy</li>
+                            <li>Added "Join the conversation" trigger for cleaner interface</li>
+                            <li>Enhanced like buttons with heart icons</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="update-item">
+                    <div class="update-date">October 12, 2025</div>
+                    <div class="update-card">
+                        <h3>✨ New Features</h3>
+                        <ul>
+                            <li>Rich text formatting for posts and replies (bold, italic, links, images)</li>
+                            <li>Like system for replies</li>
+                            <li>Nested threaded replies with toggle visibility</li>
+                            <li>Post preview with 4-line limit on home page</li>
+                            <li>Edit and delete functionality for post authors</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="update-item">
+                    <div class="update-date">October 2025</div>
+                    <div class="update-card">
+                        <h3>🔐 Authentication System</h3>
+                        <ul>
+                            <li>User authentication with Supabase</li>
+                            <li>Login and signup functionality</li>
+                            <li>User profiles with name and class</li>
+                            <li>Secure post and reply tracking</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="update-item">
+                    <div class="update-date">Initial Release</div>
+                    <div class="update-card">
+                        <h3>🚀 Launch</h3>
+                        <ul>
+                            <li>Discussion forum with posts and replies</li>
+                            <li>Clean minimalist design</li>
+                            <li>Responsive layout</li>
+                            <li>Real-time timestamps</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="modal.js"></script>
+    <script>
+        // Check authentication
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (!session) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            const userName = session.user.user_metadata.name || session.user.email;
+            document.getElementById('user-name').textContent = `Hello, ${userName}`;
+            
+            return session.user;
+        }
+
+        // Logout handler
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'login.html';
+        });
+
+        // Initialize
+        checkAuth();
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Detail - Sahabat KTB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1><a href="index.html" class="site-title">Sahabat KTB</a></h1>
+                <div class="user-info">
+                    <span id="user-name"></span>
+                    <button class="btn-logout" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Home</span>
+                </a>
+                <a href="guidelines.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Guidelines</span>
+                </a>
+                <a href="updates.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Updates</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>&copy; 2025 Sahabat KTB.<br>All rights reserved.<br>Created by Pacifora Group.</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="back-link">
+                <a href="index.html">← Back to Forum</a>
+            </div>
+            
+            <div id="post-detail-container">
+                <div class="loading">Loading post...</div>
+            </div>
+
+            <div id="replies-container">
+            <h3 id="replies-heading" style="display: none;">Replies</h3>
+            
+            <div id="reply-trigger" style="display: none;">
+                <div class="reply-trigger-box" onclick="showReplyForm()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                    <span>Join the conversation</span>
+                </div>
+            </div>
+
+            <div id="reply-section" style="display: none;">
+                <h4>Add a Reply</h4>
+                <form id="reply-form">
+                    <div class="form-group">
+                        <div class="editor-toolbar editor-toolbar-small">
+                            <button type="button" class="editor-btn" onclick="formatReplyText('bold')" title="Bold">
+                                <strong>B</strong>
+                            </button>
+                            <button type="button" class="editor-btn" onclick="formatReplyText('italic')" title="Italic">
+                                <em>I</em>
+                            </button>
+                            <button type="button" class="editor-btn" onclick="formatReplyText('underline')" title="Underline">
+                                <u>U</u>
+                            </button>
+                            <span class="toolbar-divider"></span>
+                            <button type="button" class="editor-btn" onclick="insertReplyLink()" title="Link">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M6.5 10.5L9.5 7.5M8 3.5L9.5 2C10.328 1.172 11.672 1.172 12.5 2C13.328 2.828 13.328 4.172 12.5 5L11 6.5M5 9.5L3.5 11C2.672 11.828 2.672 13.172 3.5 14C4.328 14.828 5.672 14.828 6.5 14L8 12.5"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="reply-content" class="editor-content editor-content-small" contenteditable="true" placeholder="Write your reply..."></div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-cancel" onclick="hideReplyForm()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Reply</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="replies-list"></div>
+        </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="modal.js"></script>
+    <script src="post-detail.js"></script>
+</body>
+</html>

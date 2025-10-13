@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Post - Sahabat KTB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1><a href="index.html" class="site-title">Sahabat KTB</a></h1>
+                <div class="user-info">
+                    <span id="user-name"></span>
+                    <button class="btn-logout" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Home</span>
+                </a>
+                <a href="guidelines.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Guidelines</span>
+                </a>
+                <a href="updates.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Updates</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>&copy; 2025 Sahabat KTB.<br>All rights reserved.<br>Created by Pacifora Group.</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="form-container">
+                <h2>Edit Post</h2>
+                <form id="edit-post-form">
+                    <div class="form-group">
+                        <label for="post-title">Title (Optional)</label>
+                        <input type="text" id="post-title" name="title" placeholder="Enter a title for your post..." maxlength="200">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Content <span class="required">*</span></label>
+                        <div class="editor-toolbar">
+                            <button type="button" class="editor-btn" onclick="formatText('bold')" title="Bold">
+                                <strong>B</strong>
+                            </button>
+                            <button type="button" class="editor-btn" onclick="formatText('italic')" title="Italic">
+                                <em>I</em>
+                            </button>
+                            <button type="button" class="editor-btn" onclick="formatText('underline')" title="Underline">
+                                <u>U</u>
+                            </button>
+                            <span class="toolbar-divider"></span>
+                            <button type="button" class="editor-btn" onclick="formatText('formatBlock', 'h3')" title="Heading">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <text x="0" y="11" font-size="12" font-weight="bold" fill="currentColor" stroke="none">H</text>
+                                </svg>
+                            </button>
+                            <button type="button" class="editor-btn" onclick="formatText('insertUnorderedList')" title="Bullet List">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <circle cx="2" cy="3" r="1.5" fill="currentColor"/>
+                                    <line x1="5" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.5"/>
+                                    <circle cx="2" cy="8" r="1.5" fill="currentColor"/>
+                                    <line x1="5" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5"/>
+                                    <circle cx="2" cy="13" r="1.5" fill="currentColor"/>
+                                    <line x1="5" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                            </button>
+                            <button type="button" class="editor-btn" onclick="formatText('insertOrderedList')" title="Numbered List">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <text x="0" y="4" font-size="4" fill="currentColor" stroke="none">1</text>
+                                    <line x1="5" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.5"/>
+                                    <text x="0" y="9" font-size="4" fill="currentColor" stroke="none">2</text>
+                                    <line x1="5" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5"/>
+                                    <text x="0" y="14" font-size="4" fill="currentColor" stroke="none">3</text>
+                                    <line x1="5" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                            </button>
+                            <span class="toolbar-divider"></span>
+                            <button type="button" class="editor-btn" onclick="insertQuote()" title="Quote">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M2.5 3a.5.5 0 0 0 0 1h11a.5.5 0 0 0 0-1h-11zm5 3a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1h-6zm0 3a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1h-6zm-5 3a.5.5 0 0 0 0 1h11a.5.5 0 0 0 0-1h-11zm.79-5.373c.112-.078.26-.17.444-.275L3.524 6c-.122.074-.272.17-.452.287-.18.117-.35.26-.51.428a2.425 2.425 0 0 0-.398.562c-.11.207-.164.438-.164.692 0 .36.072.65.217.873.144.219.385.328.72.328.215 0 .383-.07.504-.211a.697.697 0 0 0 .188-.463c0-.23-.07-.404-.211-.521-.137-.121-.326-.182-.568-.182h-.002c.15-.476.52-.827 1.117-1.146zm8.532.212c-.116-.08-.255-.152-.42-.22.168.14.265.336.265.555 0 .288-.115.518-.344.69-.229.173-.542.259-.94.259-.302 0-.564-.07-.785-.21a1.485 1.485 0 0 1-.524-.571 1.788 1.788 0 0 1-.188-.787c0-.333.097-.63.29-.883.197-.257.467-.452.81-.584.346-.134.738-.201 1.175-.201.168 0 .313.005.437.015v.582c-.129-.01-.275-.015-.437-.015-.5 0-.888.114-1.165.342-.277.228-.416.566-.416 1.014 0 .428.152.8.457 1.119.304.315.72.472 1.245.472.328 0 .587-.076.777-.228.189-.152.284-.357.284-.615 0-.28-.096-.527-.288-.74z"/>
+                                </svg>
+                            </button>
+                            <span class="toolbar-divider"></span>
+                            <button type="button" class="editor-btn" onclick="insertLink()" title="Link">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M6.5 10.5L9.5 7.5M8 3.5L9.5 2C10.328 1.172 11.672 1.172 12.5 2C13.328 2.828 13.328 4.172 12.5 5L11 6.5M5 9.5L3.5 11C2.672 11.828 2.672 13.172 3.5 14C4.328 14.828 5.672 14.828 6.5 14L8 12.5"/>
+                                </svg>
+                            </button>
+                            <button type="button" class="editor-btn" onclick="insertImage()" title="Image URL">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="1.5" y="2.5" width="13" height="11" rx="1"/>
+                                    <circle cx="5" cy="6" r="1.5" fill="currentColor" stroke="none"/>
+                                    <path d="M1.5 11L5 7.5L8 10.5L11 7.5L14.5 11" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="message" class="editor-content" contenteditable="true" role="textbox" aria-label="Post content"></div>
+                        <span class="field-hint">Edit your post content.</span>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Post</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="modal.js"></script>
+    <script src="edit-post.js"></script>
+</body>
+</html>
