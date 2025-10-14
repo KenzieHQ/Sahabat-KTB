@@ -5,6 +5,7 @@ let allPosts = [];
 let allLikedPostIds = [];
 let allReplyCountMap = {};
 let currentUserId = null;
+let isAdmin = false;
 
 // Format timestamp to friendly format
 function formatTimestamp(timestamp) {
@@ -31,28 +32,6 @@ function formatTimestamp(timestamp) {
         });
     }
 }
-
-// Check authentication
-async function checkAuth() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    if (!session) {
-        window.location.href = 'login.html';
-        return null;
-    }
-    
-    // Display user info in header
-    const userName = session.user.user_metadata.name || session.user.email;
-    document.getElementById('user-name').textContent = `Hello, ${userName}`;
-    
-    return session.user;
-}
-
-// Logout handler
-document.getElementById('logout-btn').addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'login.html';
-});
 
 // Toggle like on a post
 async function toggleLike(postId) {
@@ -147,6 +126,7 @@ async function createPostHTML(post, likedPostIds, replyCountMap, currentUserId) 
     const likesCount = post.likes || 0;
     const replyCount = replyCountMap[post.id] || 0;
     const isAuthor = currentUserId === post.user_id;
+    const canModify = isAuthor || isAdmin; // Admin can modify any post
     const editedText = post.updated_at ? ' (edited)' : '';
     
     // Create a temporary div to check content height
@@ -163,16 +143,18 @@ async function createPostHTML(post, likedPostIds, replyCountMap, currentUserId) 
     document.body.removeChild(tempDiv);
     
     const showMoreLink = needsTruncation ? 
-        `<a href="post-detail.html?id=${post.id}" class="show-more">Show more</a>` : '';
+        `<a href="post-detail.html?id=${post.id}" class="show-more" onclick="event.stopPropagation()">Show more</a>` : '';
     
-    const authorActionsHTML = isAuthor ? `
-        <div class="post-header-actions">
-            <button class="btn-edit" onclick="editPost(${post.id})" title="Edit post">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-            </button>
+    const authorActionsHTML = canModify ? `
+        <div class="post-header-actions" onclick="event.stopPropagation()">
+            ${isAuthor ? `
+                <button class="btn-edit" onclick="editPost(${post.id})" title="Edit post">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </button>
+            ` : ''}
             <button class="btn-delete" onclick="deletePost(${post.id})" title="Delete post">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"></polyline>
@@ -191,7 +173,7 @@ async function createPostHTML(post, likedPostIds, replyCountMap, currentUserId) 
         '' : `<div class="post-author-class">${escapeHtml(post.class)}</div>`;
     
     return `
-        <div class="post" data-post-id="${post.id}">
+        <div class="post post-clickable" data-post-id="${post.id}" onclick="navigateToPost(event, ${post.id})">
             <div class="post-header">
                 <div class="post-author">
                     <div class="post-author-name">${escapeHtml(post.name)}</div>
@@ -203,9 +185,9 @@ async function createPostHTML(post, likedPostIds, replyCountMap, currentUserId) 
                 </div>
             </div>
             ${postTitle}
-            <div class="post-content ${needsTruncation ? 'post-content-preview' : ''}" onclick="window.location.href='post-detail.html?id=${post.id}'">${post.content}</div>
+            <div class="post-content ${needsTruncation ? 'post-content-preview' : ''}">${post.content}</div>
             ${showMoreLink}
-            <div class="post-actions">
+            <div class="post-actions" onclick="event.stopPropagation()">
                 <button class="btn-like ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -230,8 +212,24 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Navigate to post detail page
+function navigateToPost(event, postId) {
+    // Don't navigate if clicking on buttons or links
+    if (event.target.closest('button') || event.target.closest('a') || event.target.closest('.post-actions')) {
+        return;
+    }
+    window.location.href = `post-detail.html?id=${postId}`;
+}
+
+// Edit post
+function editPost(postId) {
+    event.stopPropagation();
+    window.location.href = `edit-post.html?id=${postId}`;
+}
+
 // Delete post
 async function deletePost(postId) {
+    event.stopPropagation();
     const confirmed = await customConfirm(
         'Are you sure you want to delete this post? This action cannot be undone.',
         'Delete Post'
@@ -329,6 +327,10 @@ async function loadMorePosts() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-    await checkAuth();
-    await loadPosts();
+    const navData = await initializeNavigation('index');
+    if (navData) {
+        currentUserId = navData.user.id;
+        isAdmin = navData.isAdmin;
+        await loadPosts();
+    }
 });

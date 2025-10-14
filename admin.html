@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahabat KTB - Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header></header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar"></aside>
+
+        <main class="main-content">
+            <div class="admin-container">
+                <h2>Admin Panel</h2>
+                <p class="admin-subtitle">Manage users and their permissions</p>
+
+                <div id="loading-users" style="text-align: center; padding: 2rem;">
+                    <p>Loading users...</p>
+                </div>
+
+                <div id="users-table-container" style="display: none;">
+                    <div class="admin-stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-users">0</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-admins">0</div>
+                            <div class="stat-label">Admins</div>
+                        </div>
+                    </div>
+
+                    <div class="users-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Class</th>
+                                    <th>Last Sign In</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="modal.js"></script>
+    <script src="nav.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

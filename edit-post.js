@@ -1,28 +1,14 @@
-// Check authentication
-async function checkAuth() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    if (!session) {
-        window.location.href = 'login.html';
-        return null;
-    }
-    
-    const userName = session.user.user_metadata.name || session.user.email;
-    document.getElementById('user-name').textContent = `Hello, ${userName}`;
-    
-    return session.user;
-}
-
-// Logout handler
-document.getElementById('logout-btn').addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'login.html';
-});
-
 // Rich text formatting functions
 function formatText(command, value = null) {
     document.execCommand(command, false, value);
     document.getElementById('message').focus();
+}
+
+// Strip formatting on paste (paste as plain text)
+function handlePaste(e) {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
 }
 
 function insertQuote() {
@@ -145,8 +131,10 @@ async function insertImage() {
 
 // Load post data
 async function loadPost() {
-    const user = await checkAuth();
-    if (!user) return;
+    const navData = await initializeNavigation('edit-post');
+    if (!navData) return;
+    
+    const user = navData.user;
     
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
@@ -180,14 +168,23 @@ async function loadPost() {
     // Load content into editor
     document.getElementById('post-title').value = post.title || '';
     document.getElementById('message').innerHTML = post.content;
+    
+    // Add paste handler to strip formatting
+    const messageEditor = document.getElementById('message');
+    if (messageEditor) {
+        messageEditor.addEventListener('paste', handlePaste);
+    }
 }
 
 // Handle form submission
 document.getElementById('edit-post-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const user = await checkAuth();
-    if (!user) return;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+        window.location.href = 'login.html';
+        return;
+    }
     
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');

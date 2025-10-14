@@ -2,35 +2,49 @@
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('id');
 
-// Check authentication
-async function checkAuth() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    if (!session) {
-        window.location.href = 'login.html';
-        return null;
-    }
-    
-    // Display user info in header
-    const userName = session.user.user_metadata.name || session.user.email;
-    document.getElementById('user-name').textContent = `Hello, ${userName}`;
-    
-    return session.user;
+// Store current user ID
+let currentUserId = null;
+let isAdmin = false;
+
+// Strip formatting on paste (paste as plain text)
+function handlePaste(e) {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
 }
 
-// Logout handler
-document.getElementById('logout-btn').addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'login.html';
-});
+// Check if current user is admin
+async function checkIfAdmin() {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return false;
+        
+        const { data: adminData, error } = await supabaseClient
+            .from('admins')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
+        
+        return !error && adminData;
+    } catch (error) {
+        return false;
+    }
+}
 
+// Check authentication
 // Show reply form
 function showReplyForm() {
     document.getElementById('reply-trigger').style.display = 'none';
     document.getElementById('reply-section').style.display = 'block';
     // Focus on the editor
     setTimeout(() => {
-        document.getElementById('reply-content').focus();
+        const replyContent = document.getElementById('reply-content');
+        replyContent.focus();
+        // Add paste handler if not already added
+        if (!replyContent.dataset.pasteHandlerAdded) {
+            replyContent.addEventListener('paste', handlePaste);
+            replyContent.dataset.pasteHandlerAdded = 'true';
+        }
     }, 100);
 }
 
@@ -255,12 +269,24 @@ function createReplyHTML(reply, nestedReplies = [], likedReplyIds = []) {
     const hasNested = nestedReplies.length > 0;
     const isLiked = likedReplyIds.includes(reply.id);
     const likesCount = reply.likes || 0;
+    const isAuthor = currentUserId === reply.user_id;
+    const canDelete = isAuthor || isAdmin; // Admin can delete any reply
     
     return `
         <div class="reply" data-reply-id="${reply.id}">
             <div class="reply-header">
                 <span class="reply-author">${escapeHtml(reply.name)}</span>
                 <span class="reply-time">${formatTimestamp(reply.created_at)}</span>
+                ${canDelete ? `
+                    <button class="btn-delete-reply" onclick="deleteReply(${reply.id})" title="Delete reply">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                ` : ''}
             </div>
             <div class="reply-content">${reply.content}</div>
             <div class="reply-actions">
@@ -320,11 +346,23 @@ function createReplyHTML(reply, nestedReplies = [], likedReplyIds = []) {
                     ${nestedReplies.map(nr => {
                         const isNestedLiked = likedReplyIds.includes(nr.id);
                         const nestedLikesCount = nr.likes || 0;
+                        const isNestedAuthor = currentUserId === nr.user_id;
+                        const canDeleteNested = isNestedAuthor || isAdmin; // Admin can delete any nested reply
                         return `
                         <div class="nested-reply" data-reply-id="${nr.id}">
                             <div class="reply-header">
                                 <span class="reply-author">${escapeHtml(nr.name)}</span>
                                 <span class="reply-time">${formatTimestamp(nr.created_at)}</span>
+                                ${canDeleteNested ? `
+                                    <button class="btn-delete-reply" onclick="deleteReply(${nr.id})" title="Delete reply">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                        </svg>
+                                    </button>
+                                ` : ''}
                             </div>
                             <div class="reply-content">${nr.content}</div>
                             <div class="reply-actions">
@@ -348,6 +386,12 @@ function toggleNestedReplyForm(replyId) {
     const form = document.getElementById(`nested-reply-form-${replyId}`);
     if (form.style.display === 'none') {
         form.style.display = 'block';
+        // Add paste handler to nested reply editor
+        const editor = document.getElementById(`nested-reply-content-${replyId}`);
+        if (editor && !editor.dataset.pasteHandlerAdded) {
+            editor.addEventListener('paste', handlePaste);
+            editor.dataset.pasteHandlerAdded = 'true';
+        }
     } else {
         form.style.display = 'none';
         document.getElementById(`nested-reply-content-${replyId}`).innerHTML = '';
@@ -502,21 +546,24 @@ async function loadPost() {
             .select('id')
             .eq('post_id', postId)
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle();
         
         const isLiked = !!userLike;
         const likesCount = post.likes || 0;
         const isAuthor = user.id === post.user_id;
+        const canModify = isAuthor || isAdmin; // Admin can modify any post
         const editedText = post.updated_at ? ' (edited)' : '';
         
-        const authorActionsHTML = isAuthor ? `
+        const authorActionsHTML = canModify ? `
             <div class="post-header-actions">
-                <button class="btn-edit" onclick="editPost()" title="Edit post">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                </button>
+                ${isAuthor ? `
+                    <button class="btn-edit" onclick="editPost()" title="Edit post">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                ` : ''}
                 <button class="btn-delete" onclick="deletePost()" title="Delete post">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="3 6 5 6 21 6"></polyline>
@@ -695,11 +742,38 @@ async function deletePost() {
     window.location.href = 'index.html';
 }
 
-// Initialize
-loadPost();
+// Delete reply
+async function deleteReply(replyId) {
+    const confirmed = await customConfirm(
+        'Are you sure you want to delete this reply? This action cannot be undone.',
+        'Delete Reply'
+    );
+    
+    if (!confirmed) {
+        return;
+    }
+    
+    const { error } = await supabaseClient
+        .from('replies')
+        .delete()
+        .eq('id', replyId);
+    
+    if (error) {
+        console.error('Error deleting reply:', error);
+        await customAlert('Failed to delete reply. Please try again.', 'Error');
+        return;
+    }
+    
+    // Reload the post to reflect changes
+    await loadPost();
+}
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-    await checkAuth();
-    await loadPost();
+    const navData = await initializeNavigation('post-detail');
+    if (navData) {
+        currentUserId = navData.user.id;
+        isAdmin = navData.isAdmin;
+        await loadPost();
+    }
 });

@@ -203,6 +203,16 @@ main.container {
     padding: 1.25rem;
 }
 
+.post-clickable {
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-clickable:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
 .post:hover {
     border-color: var(--border-medium);
 }
@@ -345,8 +355,7 @@ main.container {
     background-color: transparent;
     color: var(--text-secondary);
     border: none;
-    padding: 0.4rem 0.875rem;
-    border-radius: 4px;
+    padding: 0;
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 500;
@@ -354,6 +363,7 @@ main.container {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    transition: color 0.2s ease;
 }
 
 .btn-like svg {
@@ -362,7 +372,6 @@ main.container {
 }
 
 .btn-like:hover {
-    background-color: var(--bg-page);
     color: var(--accent-blue);
 }
 
@@ -378,8 +387,7 @@ main.container {
     background-color: transparent;
     color: var(--text-secondary);
     border: none;
-    padding: 0.4rem 0.875rem;
-    border-radius: 4px;
+    padding: 0;
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 500;
@@ -388,6 +396,7 @@ main.container {
     align-items: center;
     gap: 0.4rem;
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 .btn-reply svg {
@@ -396,7 +405,6 @@ main.container {
 }
 
 .btn-reply:hover {
-    background-color: var(--bg-page);
     color: var(--accent-blue);
 }
 
@@ -635,6 +643,27 @@ main.container {
     white-space: nowrap;
 }
 
+.btn-delete-reply {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s ease;
+    margin-left: 0.5rem;
+}
+
+.btn-delete-reply:hover {
+    color: #e53e3e;
+}
+
+.btn-delete-reply svg {
+    width: 14px;
+    height: 14px;
+}
+
 .reply-content {
     color: var(--text-primary);
     line-height: 1.6;
@@ -661,8 +690,7 @@ main.container {
     background-color: transparent;
     color: var(--text-secondary);
     border: none;
-    padding: 0.35rem 0.75rem;
-    border-radius: 4px;
+    padding: 0;
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: 500;
@@ -670,7 +698,7 @@ main.container {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease;
 }
 
 .btn-like-reply svg {
@@ -679,7 +707,6 @@ main.container {
 }
 
 .btn-like-reply:hover {
-    background-color: var(--bg-page);
     color: var(--accent-blue);
 }
 
@@ -695,9 +722,8 @@ main.container {
 .btn-toggle-nested {
     background-color: transparent;
     color: var(--text-secondary);
-    border: 1px solid transparent;
-    padding: 0.35rem 0.75rem;
-    border-radius: 4px;
+    border: none;
+    padding: 0;
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: 500;
@@ -705,14 +731,12 @@ main.container {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease;
 }
 
 .btn-reply-to-reply:hover,
 .btn-toggle-nested:hover {
-    background-color: var(--bg-page);
     color: var(--accent-blue);
-    border-color: var(--border-medium);
 }
 
 .btn-reply-to-reply svg,
@@ -1646,6 +1670,152 @@ main.container {
     background-color: var(--accent-blue);
     color: white;
     border-color: var(--accent-blue);
+}
+
+/* Admin Panel Styles */
+.admin-container {
+    max-width: 100%;
+}
+
+.admin-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+}
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.users-table {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.users-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table thead {
+    background-color: var(--bg-page);
+}
+
+.users-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-light);
+}
+
+.users-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.users-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.users-table tbody tr:hover {
+    background-color: var(--bg-page);
+}
+
+.user-name {
+    font-weight: 500;
+}
+
+.user-email {
+    color: var(--text-secondary);
+}
+
+.user-class {
+    color: var(--text-secondary);
+}
+
+.user-signin {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.role-select {
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--border-medium);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    background-color: var(--bg-white);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.role-select:hover {
+    border-color: var(--accent-blue);
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.btn-delete-user {
+    background-color: transparent;
+    color: #e53e3e;
+    border: 1px solid #e53e3e;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.btn-delete-user:hover {
+    background-color: #e53e3e;
+    color: white;
+}
+
+.btn-delete-user svg {
+    width: 14px;
+    height: 14px;
 }
 
 .btn-load-more svg {

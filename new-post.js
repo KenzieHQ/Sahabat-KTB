@@ -1,29 +1,14 @@
-// Check authentication
-async function checkAuth() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    if (!session) {
-        window.location.href = 'login.html';
-        return null;
-    }
-    
-    // Display user info in header
-    const userName = session.user.user_metadata.name || session.user.email;
-    document.getElementById('user-name').textContent = `Hello, ${userName}`;
-    
-    return session.user;
-}
-
-// Logout handler
-document.getElementById('logout-btn').addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'login.html';
-});
-
 // Rich text editor functions
 function formatText(command, value = null) {
     document.execCommand(command, false, value);
     document.getElementById('message').focus();
+}
+
+// Strip formatting on paste (paste as plain text)
+function handlePaste(e) {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
 }
 
 function insertQuote() {
@@ -195,4 +180,12 @@ document.getElementById('new-post-form').addEventListener('submit', async (e) =>
 });
 
 // Initialize
-document.addEventListener('DOMContentLoaded', checkAuth);
+document.addEventListener('DOMContentLoaded', async () => {
+    await initializeNavigation('new-post');
+    
+    // Add paste handler to strip formatting
+    const messageEditor = document.getElementById('message');
+    if (messageEditor) {
+        messageEditor.addEventListener('paste', handlePaste);
+    }
+});
