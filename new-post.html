@@ -3,13 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahabat KTB - New Post</title>
+    <title>Thinkery - New Post</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <!-- Mobile View Notice -->
+    <div class="mobile-notice-overlay">
+        <div class="mobile-notice-content">
+            <i data-lucide="monitor" style="width: 80px; height: 80px; stroke-width: 1.5;"></i>
+            <h2>Desktop Only</h2>
+            <p>Mobile view is still in progress.</p>
+            <p>Please use a computer or laptop to access Thinkery for now.</p>
+        </div>
+    </div>
+
     <header></header>
 
     <div class="page-wrapper">
@@ -27,57 +38,37 @@
                     <label for="message">Content <span class="required">*</span></label>
                     <div class="editor-toolbar">
                         <button type="button" class="editor-btn" onclick="formatText('bold')" title="Bold">
-                            <strong>B</strong>
+                            <i data-lucide="bold" style="width: 16px; height: 16px;"></i>
                         </button>
                         <button type="button" class="editor-btn" onclick="formatText('italic')" title="Italic">
-                            <em>I</em>
+                            <i data-lucide="italic" style="width: 16px; height: 16px;"></i>
                         </button>
                         <button type="button" class="editor-btn" onclick="formatText('underline')" title="Underline">
-                            <u>U</u>
+                            <i data-lucide="underline" style="width: 16px; height: 16px;"></i>
                         </button>
                         <span class="toolbar-divider"></span>
-                        <button type="button" class="editor-btn" onclick="formatText('formatBlock', 'h3')" title="Heading">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
-                                <text x="0" y="11" font-size="12" font-weight="bold" fill="currentColor" stroke="none">H</text>
-                            </svg>
+                        <button type="button" class="editor-btn" onclick="formatText('formatBlock', 'h2')" title="Heading 1">
+                            <i data-lucide="heading-1" style="width: 16px; height: 16px;"></i>
                         </button>
+                        <button type="button" class="editor-btn" onclick="formatText('formatBlock', 'h3')" title="Heading 2">
+                            <i data-lucide="heading-2" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <span class="toolbar-divider"></span>
                         <button type="button" class="editor-btn" onclick="formatText('insertUnorderedList')" title="Bullet List">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <circle cx="2" cy="3" r="1.5" fill="currentColor"/>
-                                <line x1="5" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.5"/>
-                                <circle cx="2" cy="8" r="1.5" fill="currentColor"/>
-                                <line x1="5" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5"/>
-                                <circle cx="2" cy="13" r="1.5" fill="currentColor"/>
-                                <line x1="5" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
+                            <i data-lucide="list" style="width: 16px; height: 16px;"></i>
                         </button>
                         <button type="button" class="editor-btn" onclick="formatText('insertOrderedList')" title="Numbered List">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <text x="0" y="4.5" font-size="5" fill="currentColor">1.</text>
-                                <line x1="5" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.5"/>
-                                <text x="0" y="9.5" font-size="5" fill="currentColor">2.</text>
-                                <line x1="5" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5"/>
-                                <text x="0" y="14.5" font-size="5" fill="currentColor">3.</text>
-                                <line x1="5" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="1.5"/>
-                            </svg>
+                            <i data-lucide="list-ordered" style="width: 16px; height: 16px;"></i>
                         </button>
                         <span class="toolbar-divider"></span>
-                        <button type="button" class="editor-btn" onclick="insertQuote()" title="Quote">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M3 8c0-1.657 1.343-3 3-3V3c-2.761 0-5 2.239-5 5v5h5V8H3zm8 0c0-1.657 1.343-3 3-3V3c-2.761 0-5 2.239-5 5v5h5V8h-3z"/>
-                            </svg>
+                        <button type="button" class="editor-btn" onclick="formatText('formatBlock', 'blockquote')" title="Quote">
+                            <i data-lucide="quote" style="width: 16px; height: 16px;"></i>
                         </button>
                         <button type="button" class="editor-btn" onclick="insertLink()" title="Link">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M6.5 10.5L9.5 7.5M8 3.5L9.5 2C10.328 1.172 11.672 1.172 12.5 2C13.328 2.828 13.328 4.172 12.5 5L11 6.5M5 9.5L3.5 11C2.672 11.828 2.672 13.172 3.5 14C4.328 14.828 5.672 14.828 6.5 14L8 12.5"/>
-                            </svg>
+                            <i data-lucide="link" style="width: 16px; height: 16px;"></i>
                         </button>
-                        <button type="button" class="editor-btn" onclick="insertImage()" title="Image URL">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <rect x="1.5" y="2.5" width="13" height="11" rx="1"/>
-                                <circle cx="5" cy="6" r="1.5" fill="currentColor" stroke="none"/>
-                                <path d="M1.5 11L5 7.5L8 10.5L11 7.5L14.5 11" stroke-linejoin="round"/>
-                            </svg>
+                        <button type="button" class="editor-btn" onclick="insertImage()" title="Image">
+                            <i data-lucide="image" style="width: 16px; height: 16px;"></i>
                         </button>
                     </div>
                     <div id="message" class="editor-content" contenteditable="true" placeholder="What's on your mind?"></div>
@@ -109,5 +100,9 @@
     <script src="modal.js"></script>
     <script src="nav.js"></script>
     <script src="new-post.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>

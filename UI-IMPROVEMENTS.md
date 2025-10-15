@@ -1,4 +1,35 @@
-# UI Improvements - Like/Reply Buttons, Delete Replies, and Clickable Posts
+# UI Improvements & Consistency Update
+
+## Latest Update: Profile System UI Consistency (Oct 15, 2025)
+
+### Overview
+Updated all profile-related UI components to match the website's main design language for a consistent user experience.
+
+### Key Changes
+All profile components now use:
+- ✅ **Borders**: 1px solid `var(--border-light)` instead of shadow-only
+- ✅ **Shadows**: Light `0 2px 8px` instead of heavy `0 4px 12px`
+- ✅ **Border Radius**: 8px for cards, 6px for inputs
+- ✅ **Hover Effects**: Border color change (not transform)
+- ✅ **Font Sizes**: Consistent scale (0.875rem - 1.5rem)
+- ✅ **Padding**: Standard 1.75rem for cards
+
+### Components Updated
+1. Profile header, bio section, tabs
+2. Profile post/reply cards
+3. Settings page and form inputs
+4. User hover card
+5. User menu dropdown
+6. Clickable username links
+
+### Result
+Perfect visual harmony with existing post cards and navigation system.
+
+---
+
+# Original UI Improvements Documentation
+
+## Overview - Like/Reply Buttons, Delete Replies, and Clickable Posts
 
 ## Changes Made
 

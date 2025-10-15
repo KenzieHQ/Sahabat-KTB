@@ -19,7 +19,7 @@ DROP FUNCTION IF EXISTS sync_user_profile();
 ---
 
 ## Overview
-A comprehensive admin system has been created for the Sahabat KTB forum. The admin account `kenzie.siregar@sma-ktb.sch.id` has full administrative privileges.
+A comprehensive admin system has been created for the Thinkery forum. The admin account `kenzie.siregar@sma-ktb.sch.id` has full administrative privileges.
 
 ## Features
 

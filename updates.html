@@ -3,13 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Updates - Sahabat KTB</title>
+    <title>Updates - Thinkery</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <!-- Mobile View Notice -->
+    <div class="mobile-notice-overlay">
+        <div class="mobile-notice-content">
+            <i data-lucide="monitor" style="width: 80px; height: 80px; stroke-width: 1.5;"></i>
+            <h2>Desktop Only</h2>
+            <p>Mobile view is still in progress.</p>
+            <p>Please use a computer or laptop to access Thinkery for now.</p>
+        </div>
+    </div>
+
     <header></header>
 
     <div class="page-wrapper">
@@ -18,10 +29,62 @@
         <main class="main-content">
             <div class="updates-header">
                 <h2>Website Updates</h2>
-                <p class="updates-subtitle">Latest changes and improvements to Sahabat KTB</p>
+                <p class="updates-subtitle">Latest changes and improvements to Thinkery</p>
             </div>
 
             <div class="updates-timeline">
+                <div class="update-item">
+                    <div class="update-date">October 15, 2025</div>
+                    <div class="update-card">
+                        <h3>🎭 Anonymous Replies Feature</h3>
+                        <ul>
+                            <li>Users can now reply anonymously to posts and other replies</li>
+                            <li>Added anonymous checkbox option to reply forms</li>
+                            <li>Anonymous replies display "Anonymous" instead of user name</li>
+                            <li>Privacy-focused feature for sensitive discussions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="update-item">
+                    <div class="update-date">October 15, 2025</div>
+                    <div class="update-card">
+                        <h3>📖 Community Guidelines Added</h3>
+                        <ul>
+                            <li>Comprehensive posting guidelines now available</li>
+                            <li>Clear instructions on how to create posts</li>
+                            <li>Academic writing standards and best practices</li>
+                            <li>Community rules and code of conduct</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="update-item">
+                    <div class="update-date">October 14, 2025</div>
+                    <div class="update-card">
+                        <h3>🔖 Save Posts Feature</h3>
+                        <ul>
+                            <li>Bookmark posts to read later with new Save button</li>
+                            <li>Dedicated "Saved" page to view all saved posts</li>
+                            <li>One-click save/unsave functionality</li>
+                            <li>Visual indication for saved posts</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="update-item">
+                    <div class="update-date">October 13, 2025</div>
+                    <div class="update-card">
+                        <h3>🎨 Lucide Icons Integration</h3>
+                        <ul>
+                            <li>Replaced all icons with modern Lucide icon library</li>
+                            <li>Consistent icon design across entire platform</li>
+                            <li>Better visual clarity and aesthetics</li>
+                            <li>Icons in navigation, posts, replies, and editor</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div class="update-item">
                     <div class="update-date">October 12, 2025</div>
                     <div class="update-card">
@@ -31,6 +94,7 @@
                             <li>Improved reply section with better visual hierarchy</li>
                             <li>Added "Join the conversation" trigger for cleaner interface</li>
                             <li>Enhanced like buttons with heart icons</li>
+                            <li>Popular posts widget in right sidebar</li>
                         </ul>
                     </div>
                 </div>
@@ -45,6 +109,8 @@
                             <li>Nested threaded replies with toggle visibility</li>
                             <li>Post preview with 4-line limit on home page</li>
                             <li>Edit and delete functionality for post authors</li>
+                            <li>Post titles (optional)</li>
+                            <li>Anonymous posting option</li>
                         </ul>
                     </div>
                 </div>
@@ -58,6 +124,7 @@
                             <li>Login and signup functionality</li>
                             <li>User profiles with name and class</li>
                             <li>Secure post and reply tracking</li>
+                            <li>Admin panel for user management</li>
                         </ul>
                     </div>
                 </div>
@@ -88,6 +155,11 @@
         
         async function checkAuth() {
             await initializeNavigation('updates');
+            
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         }
     </script>
 </body>

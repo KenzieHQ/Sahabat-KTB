@@ -3,43 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Guidelines - Sahabat KTB</title>
+    <title>Community Guidelines - Thinkery</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
+<body class="guidelines-page">
+    <!-- Mobile View Notice -->
+    <div class="mobile-notice-overlay">
+        <div class="mobile-notice-content">
+            <i data-lucide="monitor" style="width: 80px; height: 80px; stroke-width: 1.5;"></i>
+            <h2>Desktop Only</h2>
+            <p>Mobile view is still in progress.</p>
+            <p>Please use a computer or laptop to access Thinkery for now.</p>
+        </div>
+    </div>
+
     <header></header>
 
     <div class="page-wrapper">
         <aside class="sidebar"></aside>
 
-        <main class="main-content">
-            <div class="guidelines-header">
-                <h2>Community Guidelines</h2>
-                <p class="guidelines-subtitle">Please review our community standards and expectations</p>
-            </div>
-
-            <div class="guidelines-content">
-                <div class="guideline-section">
-                    <h3>📋 Guidelines Coming Soon</h3>
-                    <p>We're currently working on establishing comprehensive community guidelines to ensure a positive and respectful environment for all members of Sahabat KTB.</p>
-                    <p>Check back soon for detailed information about:</p>
-                    <ul>
-                        <li>Community standards and expectations</li>
-                        <li>Content posting guidelines</li>
-                        <li>Respectful communication practices</li>
-                        <li>Reporting and moderation policies</li>
-                    </ul>
+        <main class="main-content guidelines-main">
+            <div class="guidelines-container">
+                <div class="guidelines-header-section">
+                    <h1>Community Guidelines</h1>
+                    <div class="guidelines-meta">
+                        <span id="last-edited"></span>
+                        <button id="edit-guidelines-btn" class="btn-edit-guidelines" style="display: none;">
+                            <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                            Edit Guidelines
+                        </button>
+                    </div>
                 </div>
 
-                <div class="guideline-placeholder">
-                    <p>In the meantime, please remember to:</p>
-                    <ul>
-                        <li>Be respectful and kind to other community members</li>
-                        <li>Keep discussions relevant and constructive</li>
-                        <li>Respect privacy and confidentiality</li>
-                        <li>Report any concerning content to administrators</li>
-                    </ul>
+                <!-- Editor (Admin Only) -->
+                <div id="guidelines-editor" style="display: none;">
+                    <div class="editor-toolbar">
+                        <button type="button" class="editor-btn" onclick="formatGuidelinesText('bold')" title="Bold">
+                            <i data-lucide="bold" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button type="button" class="editor-btn" onclick="formatGuidelinesText('italic')" title="Italic">
+                            <i data-lucide="italic" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button type="button" class="editor-btn" onclick="formatGuidelinesText('underline')" title="Underline">
+                            <i data-lucide="underline" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <span class="toolbar-divider"></span>
+                        <button type="button" class="editor-btn" onclick="formatGuidelinesText('formatBlock', 'h2')" title="Heading 1">
+                            <i data-lucide="heading-1" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button type="button" class="editor-btn" onclick="formatGuidelinesText('formatBlock', 'h3')" title="Heading 2">
+                            <i data-lucide="heading-2" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <span class="toolbar-divider"></span>
+                        <button type="button" class="editor-btn" onclick="formatGuidelinesText('insertUnorderedList')" title="Bullet List">
+                            <i data-lucide="list" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button type="button" class="editor-btn" onclick="formatGuidelinesText('insertOrderedList')" title="Numbered List">
+                            <i data-lucide="list-ordered" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <span class="toolbar-divider"></span>
+                        <button type="button" class="editor-btn" onclick="formatGuidelinesText('formatBlock', 'blockquote')" title="Quote">
+                            <i data-lucide="quote" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button type="button" class="editor-btn" onclick="insertGuidelinesLink()" title="Link">
+                            <i data-lucide="link" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button type="button" class="editor-btn" onclick="insertGuidelinesImage()" title="Image">
+                            <i data-lucide="image" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </div>
+                    <div id="guidelines-content-editor" class="editor-content" contenteditable="true" placeholder="Write your community guidelines here..."></div>
+                    <div class="editor-actions">
+                        <button type="button" class="btn btn-secondary" onclick="cancelEditGuidelines()">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="saveGuidelines()">Save Guidelines</button>
+                    </div>
+                </div>
+
+                <!-- Display Content -->
+                <div id="guidelines-display" class="guidelines-content-display">
+                    <div class="loading">Loading guidelines...</div>
                 </div>
             </div>
         </main>
@@ -48,12 +92,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="auth.js"></script>
+    <script src="modal.js"></script>
     <script src="nav.js"></script>
-    <script>
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            await initializeNavigation('guidelines');
-        });
-    </script>
+    <script src="guidelines-editor.js"></script>
 </body>
 </html>

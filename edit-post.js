@@ -38,13 +38,18 @@ async function insertLink() {
     const selection = window.getSelection();
     const selectedText = selection.toString();
     
-    const url = await customPrompt(
+    let url = await customPrompt(
         selectedText ? `Enter URL for "${selectedText}":` : 'Enter the URL you want to link to:',
         'Insert Link',
         'https://example.com'
     );
     
     if (url) {
+        // Add https:// if no protocol is specified
+        if (url && !url.match(/^[a-zA-Z]+:\/\//)) {
+            url = 'https://' + url;
+        }
+        
         const editor = document.getElementById('message');
         
         if (selectedText) {
@@ -99,7 +104,8 @@ async function insertImage() {
     const url = await customPrompt(
         'Enter the image URL:',
         'Insert Image',
-        'https://example.com/image.jpg'
+        'https://example.com/image.jpg',
+        ''
     );
     
     if (url) {
@@ -206,7 +212,7 @@ document.getElementById('edit-post-form').addEventListener('submit', async (e) =
                 updated_at: new Date().toISOString()
             })
             .eq('id', postId)
-            .eq('user_id', user.id);
+            .eq('user_id', session.user.id);
         
         if (error) throw error;
         

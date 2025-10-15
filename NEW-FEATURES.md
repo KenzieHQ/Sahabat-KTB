@@ -13,7 +13,7 @@
 
 ### Footer
 - **Copyright footer** added to all pages
-- Simple, clean design: "© 2025 Sahabat KTB. All rights reserved."
+- Simple, clean design: "© 2025 Thinkery. All rights reserved."
 - Dark blue background matching header
 - Displayed on all pages except login
 

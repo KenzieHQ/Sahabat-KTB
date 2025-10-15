@@ -3,13 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahabat KTB - Admin Panel</title>
+    <title>Thinkery - Admin Panel</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <!-- Mobile View Notice -->
+    <div class="mobile-notice-overlay">
+        <div class="mobile-notice-content">
+            <i data-lucide="monitor" style="width: 80px; height: 80px; stroke-width: 1.5;"></i>
+            <h2>Desktop Only</h2>
+            <p>Mobile view is still in progress.</p>
+            <p>Please use a computer or laptop to access Thinkery for now.</p>
+        </div>
+    </div>
+
     <header></header>
 
     <div class="page-wrapper">
@@ -17,8 +28,16 @@
 
         <main class="main-content">
             <div class="admin-container">
-                <h2>Admin Panel</h2>
-                <p class="admin-subtitle">Manage users and their permissions</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h2 style="margin: 0;">Admin Panel</h2>
+                        <p class="admin-subtitle" style="margin: 0.5rem 0 0 0;">Manage users and their permissions</p>
+                    </div>
+                    <button onclick="manualSyncAllUsers()" class="btn btn-secondary" title="Sync all users from authentication">
+                        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                        Refresh Users
+                    </button>
+                </div>
 
                 <div id="loading-users" style="text-align: center; padding: 2rem;">
                     <p>Loading users...</p>

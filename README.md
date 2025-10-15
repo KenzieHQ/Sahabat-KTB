@@ -1,4 +1,4 @@
-# Sahabat KTB - Discussion Forum
+# Thinkery - Discussion Forum
 
 A discussion forum website built with HTML, CSS, JavaScript, and Supabase.
 

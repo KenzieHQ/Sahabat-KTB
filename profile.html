@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Thinkery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Mobile View Notice -->
+    <div class="mobile-notice-overlay">
+        <div class="mobile-notice-content">
+            <i data-lucide="monitor" style="width: 80px; height: 80px; stroke-width: 1.5;"></i>
+            <h2>Desktop Only</h2>
+            <p>Mobile view is still in progress.</p>
+            <p>Please use a computer or laptop to access Thinkery for now.</p>
+        </div>
+    </div>
+
+    <header></header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar"></aside>
+
+        <main class="main-content">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i data-lucide="user" style="width: 48px; height: 48px;"></i>
+                </div>
+                <div class="profile-header-info">
+                    <h1 id="profile-name">Loading...</h1>
+                    <p class="profile-meta">
+                        <span id="profile-class"></span>
+                        <span class="meta-separator">•</span>
+                        <span id="profile-posts-count">0 posts</span>
+                        <span class="meta-separator">•</span>
+                        <span id="profile-replies-count">0 replies</span>
+                    </p>
+                </div>
+                <button id="edit-profile-btn" class="btn btn-secondary" style="display: none;">
+                    <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+                    Edit Profile
+                </button>
+            </div>
+
+            <!-- Profile Bio -->
+            <div class="profile-bio-section">
+                <h3>About</h3>
+                <p id="profile-bio" class="profile-bio-text">No bio added yet.</p>
+            </div>
+
+            <!-- Content Tabs -->
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="posts">
+                    <i data-lucide="file-text" style="width: 18px; height: 18px;"></i>
+                    Posts
+                </button>
+                <button class="profile-tab" data-tab="replies">
+                    <i data-lucide="message-square" style="width: 18px; height: 18px;"></i>
+                    Replies
+                </button>
+            </div>
+
+            <!-- Sort Options -->
+            <div class="profile-sort">
+                <label>Sort by:</label>
+                <select id="sort-select" class="sort-select">
+                    <option value="recent">Most Recent</option>
+                    <option value="likes">Most Liked</option>
+                </select>
+            </div>
+
+            <!-- Posts Section -->
+            <div id="posts-section" class="profile-content-section active">
+                <div id="user-posts-container">
+                    <div class="loading">Loading posts...</div>
+                </div>
+            </div>
+
+            <!-- Replies Section -->
+            <div id="replies-section" class="profile-content-section">
+                <div id="user-replies-container">
+                    <div class="loading">Loading replies...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="modal.js"></script>
+    <script src="nav.js"></script>
+    <script src="user-hover.js"></script>
+    <script src="profile.js"></script>
+    <script>
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

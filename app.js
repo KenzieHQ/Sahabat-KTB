@@ -3,6 +3,7 @@ let currentPage = 0;
 const POSTS_PER_PAGE = 8;
 let allPosts = [];
 let allLikedPostIds = [];
+let allSavedPostIds = [];
 let allReplyCountMap = {};
 let currentUserId = null;
 let isAdmin = false;
@@ -43,40 +44,130 @@ async function toggleLike(postId) {
     if (!likeButton) return;
     
     const isLiked = likeButton.classList.contains('liked');
+    const likeCountSpan = likeButton.querySelector('span');
+    let currentCount = parseInt(likeCountSpan.textContent) || 0;
     
+    // Optimistically update UI immediately
+    if (isLiked) {
+        likeButton.classList.remove('liked');
+        currentCount = Math.max(0, currentCount - 1);
+        likeCountSpan.textContent = currentCount;
+        
+        // Update global state
+        const index = allLikedPostIds.indexOf(postId);
+        if (index > -1) allLikedPostIds.splice(index, 1);
+    } else {
+        likeButton.classList.add('liked');
+        currentCount++;
+        likeCountSpan.textContent = currentCount;
+        
+        // Update global state
+        if (!allLikedPostIds.includes(postId)) {
+            allLikedPostIds.push(postId);
+        }
+    }
+    
+    // Reinitialize Lucide icons to update the fill state
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    // Update in background without blocking UI
     try {
         if (isLiked) {
-            // Unlike: Remove from post_likes and decrement count
-            const { error: deleteError } = await supabaseClient
+            await supabaseClient
                 .from('post_likes')
                 .delete()
                 .eq('post_id', postId)
                 .eq('user_id', user.id);
             
-            if (deleteError) throw deleteError;
-            
-            const { error: updateError } = await supabaseClient.rpc('decrement_likes', { post_id: postId });
-            
-            if (updateError) throw updateError;
-            
+            await supabaseClient.rpc('decrement_likes', { post_id: postId });
         } else {
-            // Like: Add to post_likes and increment count
-            const { error: insertError } = await supabaseClient
+            await supabaseClient
                 .from('post_likes')
                 .insert([{ post_id: postId, user_id: user.id }]);
             
-            if (insertError) throw insertError;
-            
-            const { error: updateError } = await supabaseClient.rpc('increment_likes', { post_id: postId });
-            
-            if (updateError) throw updateError;
+            await supabaseClient.rpc('increment_likes', { post_id: postId });
         }
-        
-        // Reload posts to reflect changes
-        await loadPosts();
-        
     } catch (error) {
         console.error('Error toggling like:', error);
+        // Revert UI on error
+        if (isLiked) {
+            likeButton.classList.add('liked');
+            likeCountSpan.textContent = currentCount + 1;
+            allLikedPostIds.push(postId);
+        } else {
+            likeButton.classList.remove('liked');
+            likeCountSpan.textContent = Math.max(0, currentCount - 1);
+            const index = allLikedPostIds.indexOf(postId);
+            if (index > -1) allLikedPostIds.splice(index, 1);
+        }
+        // Reinitialize icons after revert
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+}
+
+// Toggle save/bookmark on a post
+async function toggleSave(postId) {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return;
+    
+    const saveButton = document.querySelector(`[data-post-id="${postId}"] .btn-save`);
+    if (!saveButton) return;
+    
+    const isSaved = saveButton.classList.contains('saved');
+    
+    // Optimistically update UI immediately
+    if (isSaved) {
+        saveButton.classList.remove('saved');
+        
+        // Update global state
+        const index = allSavedPostIds.indexOf(postId);
+        if (index > -1) allSavedPostIds.splice(index, 1);
+    } else {
+        saveButton.classList.add('saved');
+        
+        // Update global state
+        if (!allSavedPostIds.includes(postId)) {
+            allSavedPostIds.push(postId);
+        }
+    }
+    
+    // Reinitialize Lucide icons to update the fill state
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    // Update in background without blocking UI
+    try {
+        if (isSaved) {
+            await supabaseClient
+                .from('saved_posts')
+                .delete()
+                .eq('post_id', postId)
+                .eq('user_id', user.id);
+        } else {
+            await supabaseClient
+                .from('saved_posts')
+                .insert([{ post_id: postId, user_id: user.id }]);
+        }
+    } catch (error) {
+        console.error('Error toggling save:', error);
+        // Revert UI on error
+        if (isSaved) {
+            saveButton.classList.add('saved');
+            allSavedPostIds.push(postId);
+        } else {
+            saveButton.classList.remove('saved');
+            const index = allSavedPostIds.indexOf(postId);
+            if (index > -1) allSavedPostIds.splice(index, 1);
+        }
+        // Reinitialize icons after revert
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 }
 
@@ -86,12 +177,40 @@ async function fetchPosts() {
         const { data: { user } } = await supabaseClient.auth.getUser();
         if (!user) return { posts: [], likedPostIds: [], replyCountMap: {} };
         
+        // Fetch posts
         const { data: posts, error: postsError } = await supabaseClient
             .from('posts')
             .select('*')
             .order('created_at', { ascending: false });
 
         if (postsError) throw postsError;
+        
+        // Get unique user IDs from posts
+        const userIds = [...new Set(posts.map(p => p.user_id))];
+        
+        // Fetch user profiles for these users
+        const { data: profiles, error: profilesError } = await supabaseClient
+            .from('user_profiles')
+            .select('user_id, name, class')
+            .in('user_id', userIds);
+        
+        // Create a map of user profiles
+        const profileMap = {};
+        if (profiles) {
+            profiles.forEach(profile => {
+                profileMap[profile.user_id] = profile;
+            });
+        }
+        
+        // Merge user profile data into posts
+        const postsWithProfiles = posts.map(post => {
+            const profile = profileMap[post.user_id];
+            return {
+                ...post,
+                name: post.is_anonymous ? 'Anonymous' : (profile?.name || post.name),
+                class: post.is_anonymous ? '' : (profile?.class || post.class)
+            };
+        });
         
         // Get user's liked posts
         const { data: userLikes, error: likesError } = await supabaseClient
@@ -100,6 +219,14 @@ async function fetchPosts() {
             .eq('user_id', user.id);
         
         const likedPostIds = userLikes ? userLikes.map(like => like.post_id) : [];
+        
+        // Get user's saved posts
+        const { data: userSaves, error: savesError } = await supabaseClient
+            .from('saved_posts')
+            .select('post_id')
+            .eq('user_id', user.id);
+        
+        const savedPostIds = userSaves ? userSaves.map(save => save.post_id) : [];
         
         // Get reply counts for each post
         const { data: replyCounts, error: replyError } = await supabaseClient
@@ -113,34 +240,52 @@ async function fetchPosts() {
             });
         }
 
-        return { posts, likedPostIds, replyCountMap };
+        return { posts: postsWithProfiles, likedPostIds, savedPostIds, replyCountMap };
     } catch (error) {
         console.error('Error fetching data:', error);
-        return { posts: [], likedPostIds: [], replyCountMap: {} };
+        return { posts: [], likedPostIds: [], savedPostIds: [], replyCountMap: {} };
     }
 }
 
 // Create post HTML (without inline replies)
-async function createPostHTML(post, likedPostIds, replyCountMap, currentUserId) {
+async function createPostHTML(post, likedPostIds, savedPostIds, replyCountMap, currentUserId) {
     const isLiked = likedPostIds.includes(post.id);
+    const isSaved = savedPostIds.includes(post.id);
     const likesCount = post.likes || 0;
     const replyCount = replyCountMap[post.id] || 0;
     const isAuthor = currentUserId === post.user_id;
     const canModify = isAuthor || isAdmin; // Admin can modify any post
     const editedText = post.updated_at ? ' (edited)' : '';
     
-    // Create a temporary div to check content height
+    // Extract images from content for preview
     const tempDiv = document.createElement('div');
-    tempDiv.style.cssText = 'position: absolute; visibility: hidden; line-height: 1.6; font-size: 0.95rem; width: 100%;';
     tempDiv.innerHTML = post.content;
-    document.body.appendChild(tempDiv);
+    const images = tempDiv.querySelectorAll('img');
+    let firstImage = null;
+    
+    if (images.length > 0) {
+        firstImage = images[0].cloneNode(true);
+        firstImage.style.cssText = 'width: 100%; height: auto; display: block; margin-bottom: 1rem; border-radius: 8px; object-fit: cover;';
+    }
+    
+    // Remove ALL images from content for display (they'll be shown separately at top)
+    const contentWithoutImages = document.createElement('div');
+    contentWithoutImages.innerHTML = post.content;
+    contentWithoutImages.querySelectorAll('img').forEach(img => img.remove());
+    const contentToDisplay = contentWithoutImages.innerHTML;
+    
+    // Check content height for truncation (without images)
+    const textDiv = document.createElement('div');
+    textDiv.innerHTML = contentToDisplay;
+    textDiv.style.cssText = 'position: absolute; visibility: hidden; line-height: 1.6; font-size: 0.95rem; width: 100%;';
+    document.body.appendChild(textDiv);
     
     // Calculate if content exceeds 4 lines (approximate)
     const lineHeight = 1.6 * 0.95 * 16; // line-height * font-size * base font
     const maxHeight = lineHeight * 4;
-    const needsTruncation = tempDiv.scrollHeight > maxHeight;
+    const needsTruncation = textDiv.scrollHeight > maxHeight;
     
-    document.body.removeChild(tempDiv);
+    document.body.removeChild(textDiv);
     
     const showMoreLink = needsTruncation ? 
         `<a href="post-detail.html?id=${post.id}" class="show-more" onclick="event.stopPropagation()">Show more</a>` : '';
@@ -149,57 +294,57 @@ async function createPostHTML(post, likedPostIds, replyCountMap, currentUserId) 
         <div class="post-header-actions" onclick="event.stopPropagation()">
             ${isAuthor ? `
                 <button class="btn-edit" onclick="editPost(${post.id})" title="Edit post">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
+                    <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
                 </button>
             ` : ''}
             <button class="btn-delete" onclick="deletePost(${post.id})" title="Delete post">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                </svg>
+                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
             </button>
         </div>
     ` : '';
     
     const postTitle = post.title ? `<h2 class="post-title">${escapeHtml(post.title)}</h2>` : '';
     
-    // Don't show class if post is anonymous or class is empty
-    const classDisplay = (post.is_anonymous || !post.class || post.class.trim() === '') ? 
-        '' : `<div class="post-author-class">${escapeHtml(post.class)}</div>`;
+    // Build author info with clickable username
+    const usernameHTML = post.is_anonymous 
+        ? escapeHtml(post.name)
+        : `<span class="username-link" data-user-id="${post.user_id}" data-user-name="${escapeHtml(post.name)}">${escapeHtml(post.name)}</span>`;
+    
+    const authorInfo = post.is_anonymous || !post.class || post.class.trim() === '' 
+        ? usernameHTML
+        : `${usernameHTML} • ${escapeHtml(post.class)}`;
+    
+    // Create image HTML for preview (always at top)
+    const imageHTML = firstImage ? `<div class="post-image-preview">${firstImage.outerHTML}</div>` : '';
     
     return `
         <div class="post post-clickable" data-post-id="${post.id}" onclick="navigateToPost(event, ${post.id})">
             <div class="post-header">
-                <div class="post-author">
-                    <div class="post-author-name">${escapeHtml(post.name)}</div>
-                    ${classDisplay}
+                <div class="post-meta">
+                    <span class="post-author-name">${authorInfo}</span>
+                    <span class="post-meta-separator">•</span>
+                    <span class="post-time">${formatTimestamp(post.created_at)}${editedText}</span>
                 </div>
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div class="post-time">${formatTimestamp(post.created_at)}${editedText}</div>
+                <div class="post-header-actions">
                     ${authorActionsHTML}
                 </div>
             </div>
             ${postTitle}
-            <div class="post-content ${needsTruncation ? 'post-content-preview' : ''}">${post.content}</div>
+            ${imageHTML}
+            <div class="post-content ${needsTruncation ? 'post-content-preview' : ''}">${contentToDisplay}</div>
             ${showMoreLink}
             <div class="post-actions" onclick="event.stopPropagation()">
                 <button class="btn-like ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
+                    <i data-lucide="heart" style="width: 18px; height: 18px; ${isLiked ? 'fill: currentColor;' : ''}"></i>
                     <span>${likesCount}</span>
                 </button>
                 <a href="post-detail.html?id=${post.id}" class="btn-reply">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                    </svg>
-                    <span>${replyCount > 0 ? `${replyCount} ${replyCount === 1 ? 'Reply' : 'Replies'}` : 'Reply'}</span>
+                    <i data-lucide="message-circle" style="width: 16px; height: 16px;"></i>
+                    <span>${replyCount || 0}</span>
                 </a>
+                <button class="btn-save ${isSaved ? 'saved' : ''}" onclick="toggleSave(${post.id})" title="${isSaved ? 'Unsave' : 'Save'} post">
+                    <i data-lucide="bookmark" style="width: 16px; height: 16px; ${isSaved ? 'fill: currentColor;' : ''}"></i>
+                </button>
             </div>
         </div>
     `;
@@ -268,11 +413,12 @@ async function loadPosts() {
     
     currentUserId = user.id;
     
-    const { posts, likedPostIds, replyCountMap } = await fetchPosts();
+    const { posts, likedPostIds, savedPostIds, replyCountMap } = await fetchPosts();
     
     // Store all data globally
     allPosts = posts;
     allLikedPostIds = likedPostIds;
+    allSavedPostIds = savedPostIds;
     allReplyCountMap = replyCountMap;
     currentPage = 0;
     
@@ -298,7 +444,7 @@ async function displayPostsPage() {
     const postsToDisplay = allPosts.slice(startIndex, endIndex);
     
     const postsHTML = await Promise.all(
-        postsToDisplay.map(post => createPostHTML(post, allLikedPostIds, allReplyCountMap, currentUserId))
+        postsToDisplay.map(post => createPostHTML(post, allLikedPostIds, allSavedPostIds, allReplyCountMap, currentUserId))
     );
     
     container.innerHTML = postsHTML.join('');
@@ -317,12 +463,63 @@ async function displayPostsPage() {
         `;
         container.appendChild(loadMoreButton);
     }
+    
+    // Reinitialize Lucide icons after rendering
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    // Reinitialize hover cards
+    if (typeof initializeUserHoverCards === 'function') {
+        initializeUserHoverCards();
+    }
 }
 
 // Load more posts
 async function loadMorePosts() {
     currentPage++;
     await displayPostsPage();
+}
+
+// Load popular posts for right sidebar
+async function loadPopularPosts() {
+    try {
+        const { data: posts, error } = await supabaseClient
+            .from('posts')
+            .select('id, title, content, name, likes')
+            .order('likes', { ascending: false })
+            .limit(3);
+        
+        if (error) throw error;
+        
+        const popularPostsList = document.getElementById('popular-posts-list');
+        
+        if (!posts || posts.length === 0) {
+            popularPostsList.innerHTML = '<p class="loading-small">No posts yet</p>';
+            return;
+        }
+        
+        popularPostsList.innerHTML = posts.map(post => {
+            // Get title or truncated content
+            const displayTitle = post.title || post.content.replace(/<[^>]*>/g, '').substring(0, 60) + '...';
+            
+            return `
+                <div class="popular-post-item" onclick="window.location.href='post-detail.html?id=${post.id}'">
+                    <div class="popular-post-title">${escapeHtml(displayTitle)}</div>
+                    <div class="popular-post-meta">
+                        <span class="popular-post-author">${escapeHtml(post.name)}</span>
+                        <span class="popular-post-likes">
+                            <i data-lucide="heart" style="width: 14px; height: 14px; fill: currentColor;"></i>
+                            ${post.likes || 0}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading popular posts:', error);
+        document.getElementById('popular-posts-list').innerHTML = '<p class="loading-small">Failed to load</p>';
+    }
 }
 
 // Initialize
@@ -332,5 +529,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentUserId = navData.user.id;
         isAdmin = navData.isAdmin;
         await loadPosts();
+        await loadPopularPosts();
+        
+        // Initialize Lucide icons after content loaded
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        
+        // Initialize user hover cards
+        if (typeof initializeUserHoverCards === 'function') {
+            initializeUserHoverCards();
+        }
     }
 });

@@ -1,7 +1,7 @@
 # Custom Modal System Implementation
 
 ## Overview
-Replaced all browser default `alert()`, `confirm()`, and `prompt()` dialogs with custom-styled modals that match the Sahabat KTB design system.
+Replaced all browser default `alert()`, `confirm()`, and `prompt()` dialogs with custom-styled modals that match the Thinkery design system.
 
 ## What Was Changed
 

@@ -24,6 +24,36 @@ function formatTimestamp(timestamp) {
     });
 }
 
+// Manual sync all users (call SQL function)
+async function manualSyncAllUsers() {
+    try {
+        const btn = event.target.closest('button');
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader" style="width: 16px; height: 16px; animation: spin 1s linear infinite;"></i> Syncing...';
+        
+        // Call the SQL to sync all users from auth.users to user_profiles
+        const { error } = await supabaseClient.rpc('sync_all_users');
+        
+        if (error) {
+            console.error('Error syncing users:', error);
+            await customAlert('Could not sync users. Make sure the database trigger is set up.', 'Sync Failed');
+        } else {
+            await customAlert('All users have been synced successfully!', 'Sync Complete');
+        }
+        
+        // Reload the users table
+        await loadUsers();
+        
+        // Reset button
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i> Refresh Users';
+        lucide.createIcons();
+    } catch (error) {
+        console.error('Error in manualSyncAllUsers:', error);
+        await customAlert('An error occurred while syncing users.', 'Error');
+    }
+}
+
 // Sync user profiles from auth.users (manual sync since trigger was removed)
 async function syncUserProfiles() {
     try {
@@ -98,12 +128,7 @@ async function loadUsers() {
                 </td>
                 <td>
                     <button class="btn-delete-user" onclick="deleteUser('${profile.user_id}', '${escapeHtml(profile.email)}')" title="Delete user">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                        </svg>
+                        <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
                         Delete
                     </button>
                 </td>
@@ -114,6 +139,11 @@ async function loadUsers() {
         // Show table, hide loading
         document.getElementById('loading-users').style.display = 'none';
         document.getElementById('users-table-container').style.display = 'block';
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
         
     } catch (error) {
         console.error('Error loading users:', error);

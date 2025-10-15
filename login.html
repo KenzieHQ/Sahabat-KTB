@@ -3,83 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahabat KTB - Login</title>
+    <title>Thinkery - Login</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=2">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="login-page">
-    <main class="container">
-        <div class="auth-container">
-            <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">Login</button>
-                <button class="auth-tab" data-tab="signup">Sign Up</button>
+    <!-- Mobile View Notice -->
+    <div class="mobile-notice-overlay">
+        <div class="mobile-notice-content">
+            <i data-lucide="monitor" style="width: 80px; height: 80px; stroke-width: 1.5;"></i>
+            <h2>Desktop Only</h2>
+            <p>Mobile view is still in progress.</p>
+            <p>Please use a computer or laptop to access Thinkery for now.</p>
+        </div>
+    </div>
+
+    <div class="login-wrapper">
+        <!-- Left Side - Image -->
+        <div class="login-visual">
+            <div class="login-overlay">
+                <div class="login-branding">
+                    <img src="logo.svg" alt="Thinkery" class="brand-logo" style="height: 60px; width: auto; margin-bottom: 10px;">
+                    <p class="brand-tagline">By Pacifora</p>
+                </div>
             </div>
+            <img src="placeholder.jpeg" alt="Thinkery" class="login-bg-image">
+        </div>
 
-            <!-- Login Form -->
-            <div id="login-form" class="auth-form active">
-                <h2>Welcome Back</h2>
-                <form id="login-form-element">
-                    <div class="form-group">
-                        <label for="login-email">Email <span class="required">*</span></label>
-                        <input type="email" id="login-email" placeholder="your@email.com" required>
-                    </div>
+        <!-- Right Side - Forms -->
+        <div class="login-forms">
+            <div class="login-forms-container">
+                <!-- Tab Navigation -->
+                <div class="login-tabs">
+                    <button class="login-tab active" data-tab="login">Login</button>
+                    <button class="login-tab" data-tab="signup">Sign Up</button>
+                </div>
 
-                    <div class="form-group">
-                        <label for="login-password">Password <span class="required">*</span></label>
-                        <input type="password" id="login-password" placeholder="Enter your password" required>
-                    </div>
+                <!-- Login Form -->
+                <div id="login-form" class="login-form-panel active">
+                    <form id="login-form-element">
+                        <div class="input-group">
+                            <label for="login-email">Email Address</label>
+                            <input type="email" id="login-email" placeholder="your@sma-ktb.sch.id" required>
+                        </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">Login</button>
-                </form>
-                <div class="auth-message" id="login-message"></div>
-            </div>
+                        <div class="input-group">
+                            <label for="login-password">Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="login-password" placeholder="Enter your password" required>
+                                <button type="button" class="toggle-password" onclick="togglePassword('login-password', this)">
+                                    <i data-lucide="eye" class="eye-icon" style="width: 20px; height: 20px;"></i>
+                                    <i data-lucide="eye-off" class="eye-off-icon" style="width: 20px; height: 20px; display: none;"></i>
+                                </button>
+                            </div>
+                        </div>
 
-            <!-- Sign Up Form -->
-            <div id="signup-form" class="auth-form">
-                <h2>Create Account</h2>
-                <form id="signup-form-element">
-                    <div class="form-group">
-                        <label for="signup-name">Name <span class="required">*</span></label>
-                        <input type="text" id="signup-name" placeholder="Jane Doe" required>
-                        <span class="field-hint">This will be displayed on your posts.</span>
-                    </div>
+                        <button type="submit" class="login-btn">Sign In</button>
+                    </form>
+                    <div class="auth-message" id="login-message"></div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="signup-email">Email <span class="required">*</span></label>
-                        <input type="email" id="signup-email" placeholder="your@email.com" required>
-                    </div>
+                <!-- Sign Up Form -->
+                <div id="signup-form" class="login-form-panel">
+                    <form id="signup-form-element">
+                        <div class="input-group">
+                            <label for="signup-name">Full Name</label>
+                            <input type="text" id="signup-name" placeholder="Jane Doe" required>
+                            <span class="input-hint">Please use your real full name</span>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="signup-class">Class <span class="required">*</span></label>
-                        <select id="signup-class" required>
-                            <option value="">Select a class</option>
-                            <option value="Ki Hajar Dewantara">Ki Hajar Dewantara</option>
-                            <option value="Dewi Sartika">Dewi Sartika</option>
-                            <option value="Ahmad Dahlan">Ahmad Dahlan</option>
-                            <option value="R.A. Kartini">R.A. Kartini</option>
-                            <option value="Hasyim Asy'ari">Hasyim Asy'ari</option>
-                        </select>
-                        <span class="field-hint">Choose your class.</span>
-                    </div>
+                        <div class="input-group">
+                            <label for="signup-email">Email Address</label>
+                            <input type="email" id="signup-email" placeholder="your@sma-ktb.sch.id" required>
+                            <span class="input-hint">Please use your school email address</span>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="signup-password">Password <span class="required">*</span></label>
-                        <input type="password" id="signup-password" placeholder="Create a password" required minlength="6">
-                        <span class="field-hint">At least 6 characters.</span>
-                    </div>
+                        <div class="input-group">
+                            <label for="signup-class">Class</label>
+                            <select id="signup-class" required>
+                                <option value="">Select your class</option>
+                                <option value="Ki Hajar Dewantara">Ki Hajar Dewantara</option>
+                                <option value="Dewi Sartika">Dewi Sartika</option>
+                                <option value="Ahmad Dahlan">Ahmad Dahlan</option>
+                                <option value="R.A. Kartini">R.A. Kartini</option>
+                                <option value="Hasyim Asy'ari">Hasyim Asy'ari</option>
+                            </select>
+                        </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
-                </form>
-                <div class="auth-message" id="signup-message"></div>
+                        <div class="input-group">
+                            <label for="signup-password">Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="signup-password" placeholder="At least 6 characters" required minlength="6">
+                                <button type="button" class="toggle-password" onclick="togglePassword('signup-password', this)">
+                                    <i data-lucide="eye" class="eye-icon" style="width: 20px; height: 20px;"></i>
+                                    <i data-lucide="eye-off" class="eye-off-icon" style="width: 20px; height: 20px; display: none;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="login-btn">Create Account</button>
+                    </form>
+                    <div class="auth-message" id="signup-message"></div>
+                </div>
+
+                <!-- Copyright -->
+                <div class="login-copyright">
+                    © 2025 Thinkery. All rights reserved. Created by Pacifora Group.
+                </div>
             </div>
         </div>
-    </main>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="modal.js"></script>
     <script src="auth.js"></script>
+    <script>
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const eyeIcon = button.querySelector('.eye-icon');
+            const eyeOffIcon = button.querySelector('.eye-off-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.style.display = 'none';
+                eyeOffIcon.style.display = 'block';
+            } else {
+                input.type = 'password';
+                eyeIcon.style.display = 'block';
+                eyeOffIcon.style.display = 'none';
+            }
+        }
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>

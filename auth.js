@@ -1,14 +1,14 @@
 // Tab switching
-document.querySelectorAll('.auth-tab').forEach(tab => {
+document.querySelectorAll('.login-tab, .auth-tab').forEach(tab => {
     tab.addEventListener('click', () => {
         const tabName = tab.dataset.tab;
         
-        // Update active tab
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        // Update active tab (support both old and new class names)
+        document.querySelectorAll('.login-tab, .auth-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         
-        // Update active form
-        document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+        // Update active form (support both old and new class names)
+        document.querySelectorAll('.login-form-panel, .auth-form').forEach(form => form.classList.remove('active'));
         document.getElementById(`${tabName}-form`).classList.add('active');
         
         // Clear messages

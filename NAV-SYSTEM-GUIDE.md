@@ -1,4 +1,38 @@
-# Centralized Navigation System Implementation Guide
+# Navigation System Guide
+
+## Latest Update: User Menu Dropdown (Oct 15, 2025)
+
+### Overview
+Updated the navigation header to include a three-dot menu dropdown next to the user's name, providing quick access to profile and account settings.
+
+### Before:
+- User name displayed
+- "Logout" button with icon and text
+
+### After:
+- User name displayed  
+- **Three-dot menu button (⋮)** next to name
+- Dropdown menu with:
+  - 👤 **View Profile** - Go to your profile page
+  - ⚙️ **Account Settings** - Edit your account
+  - ➖ Divider line
+  - 🚪 **Log Out** - Sign out
+
+### Features
+- **Click to toggle**: Click the three-dot button to open/close
+- **Auto-close**: Closes when clicking outside the menu
+- **Smooth animation**: Fade in/out with slide effect
+- **Icon-based**: Uses Lucide icons for visual clarity
+
+### Files Modified
+1. **nav.js** - Added user menu HTML and toggle functionality
+2. **styles.css** - Added dropdown menu styles
+
+---
+
+# Original Navigation System Documentation
+
+## Overview
 
 ## ✅ Completed:
 - `nav.js` - Created centralized navigation component
