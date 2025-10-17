@@ -306,9 +306,17 @@ async function createPostHTML(post, likedPostIds, savedPostIds, replyCountMap, c
     const postTitle = post.title ? `<h2 class="post-title">${escapeHtml(post.title)}</h2>` : '';
     
     // Build author info with clickable username
-    const usernameHTML = post.is_anonymous 
-        ? escapeHtml(post.name)
-        : `<span class="username-link" data-user-id="${post.user_id}" data-user-name="${escapeHtml(post.name)}">${escapeHtml(post.name)}</span>`;
+    // Admins can see who anonymous users are
+    let usernameHTML;
+    if (post.is_anonymous) {
+        if (isAdmin) {
+            usernameHTML = `<a href="profile.html?id=${post.user_id}" class="anonymous-admin-link" title="Admin: View actual profile">Anonymous</a>`;
+        } else {
+            usernameHTML = 'Anonymous';
+        }
+    } else {
+        usernameHTML = `<span class="username-link" data-user-id="${post.user_id}" data-user-name="${escapeHtml(post.name)}">${escapeHtml(post.name)}</span>`;
+    }
     
     const authorInfo = post.is_anonymous || !post.class || post.class.trim() === '' 
         ? usernameHTML

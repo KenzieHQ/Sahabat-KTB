@@ -325,10 +325,18 @@ function createReplyHTML(reply, nestedReplies = [], likedReplyIds = []) {
     const isAuthor = currentUserId === reply.user_id;
     const canDelete = isAuthor || isAdmin; // Admin can delete any reply
     
-    // Build username with clickable link if not anonymous
-    const displayName = reply.is_anonymous 
-        ? 'Anonymous' 
-        : `<span class="username-link" data-user-id="${reply.user_id}" data-user-name="${escapeHtml(reply.name)}">${escapeHtml(reply.name)}</span>`;
+    // Build username with clickable link
+    // Admins can see who anonymous users are
+    let displayName;
+    if (reply.is_anonymous) {
+        if (isAdmin) {
+            displayName = `<a href="profile.html?id=${reply.user_id}" class="anonymous-admin-link" title="Admin: View actual profile">Anonymous</a>`;
+        } else {
+            displayName = 'Anonymous';
+        }
+    } else {
+        displayName = `<span class="username-link" data-user-id="${reply.user_id}" data-user-name="${escapeHtml(reply.name)}">${escapeHtml(reply.name)}</span>`;
+    }
     
     return `
         <div class="reply" data-reply-id="${reply.id}">
@@ -725,10 +733,18 @@ async function loadPost() {
         const postContainer = document.getElementById('post-detail-container');
         const postTitle = post.title ? `<h2 class="post-title">${escapeHtml(post.title)}</h2>` : '';
         
-        // Build username with clickable link if not anonymous
-        const usernameHTML = post.is_anonymous 
-            ? currentName
-            : `<span class="username-link" data-user-id="${post.user_id}" data-user-name="${escapeHtml(currentName)}">${escapeHtml(currentName)}</span>`;
+        // Build username with clickable link
+        // Admins can see who anonymous users are
+        let usernameHTML;
+        if (post.is_anonymous) {
+            if (isAdmin) {
+                usernameHTML = `<a href="profile.html?id=${post.user_id}" class="anonymous-admin-link" title="Admin: View actual profile">Anonymous</a>`;
+            } else {
+                usernameHTML = 'Anonymous';
+            }
+        } else {
+            usernameHTML = `<span class="username-link" data-user-id="${post.user_id}" data-user-name="${escapeHtml(currentName)}">${escapeHtml(currentName)}</span>`;
+        }
         
         const authorInfo = post.is_anonymous || !currentClass || currentClass.trim() === '' 
             ? usernameHTML

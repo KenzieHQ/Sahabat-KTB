@@ -134,6 +134,9 @@ header h1 {
 /* User Menu Dropdown */
 .user-menu-container {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .btn-user-menu {
@@ -202,6 +205,163 @@ header h1 {
     height: 1px;
     background-color: var(--border-light);
     margin: 0.25rem 0;
+}
+
+/* Notifications */
+.btn-notifications {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.btn-notifications:hover {
+    background-color: var(--bg-page);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: #e53e3e;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.35rem;
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notifications-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 60px;
+    width: 360px;
+    max-width: calc(100vw - 2rem);
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+.notifications-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.notifications-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notifications-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.btn-mark-read {
+    background: none;
+    border: none;
+    color: var(--accent-blue);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-mark-read:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.notifications-list {
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-light);
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: var(--bg-page);
+}
+
+.notification-item.unread {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-content p {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.notification-content strong {
+    font-weight: 600;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.notification-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-blue);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+}
+
+.no-notifications {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
 }
 
 .btn-logout {
@@ -303,6 +463,12 @@ header h1 {
 
 .nav-item svg {
     flex-shrink: 0;
+}
+
+.nav-divider {
+    height: 1px;
+    background-color: var(--border-light);
+    margin: 0.75rem 0;
 }
 
 .sidebar-footer {
@@ -2557,6 +2723,29 @@ body:has(.admin-container) .main-content {
 
 .user-name {
     font-weight: 500;
+}
+
+.admin-user-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.admin-user-link:hover {
+    color: var(--accent-blue);
+    text-decoration: underline;
+}
+
+.anonymous-admin-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-style: italic;
+    transition: color 0.2s ease;
+}
+
+.anonymous-admin-link:hover {
+    color: var(--primary-blue);
+    text-decoration: underline;
 }
 
 .user-email {
