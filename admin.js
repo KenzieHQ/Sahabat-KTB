@@ -95,18 +95,22 @@ async function loadUsers() {
         
         if (profilesError) throw profilesError;
         
-        // Get all admins
+        // Get all admins using RPC function
         const { data: admins, error: adminsError } = await supabaseClient
-            .from('admins')
-            .select('user_id');
+            .rpc('get_admin_user_ids');
         
-        if (adminsError) throw adminsError;
+        console.log('Admins fetched:', admins);
         
-        const adminUserIds = new Set(admins.map(a => a.user_id));
+        if (adminsError) {
+            console.error('Error fetching admins:', adminsError);
+            throw adminsError;
+        }
+        
+        const adminUserIds = new Set((admins || []).map(a => a.user_id));
         
         // Update stats
         document.getElementById('total-users').textContent = profiles.length;
-        document.getElementById('total-admins').textContent = admins.length;
+        document.getElementById('total-admins').textContent = adminUserIds.size;
         
         // Build table
         const tbody = document.getElementById('users-table-body');
@@ -161,41 +165,41 @@ async function updateUserRole(userId, newRole) {
         console.log('Updating user role:', userId, 'to', newRole);
         
         if (newRole === 'admin') {
-            // Add to admins table
+            // Call database function to promote user
             const { data, error } = await supabaseClient
-                .from('admins')
-                .insert([{ user_id: userId }])
-                .select();
+                .rpc('promote_to_admin', { target_user_id: userId });
             
-            console.log('Insert result:', { data, error });
+            console.log('Promote result:', { data, error });
             
             if (error) {
-                // Check if already admin
-                if (error.code === '23505') {
-                    await customAlert('User is already an admin.', 'Info');
-                    return;
-                }
                 console.error('Error promoting to admin:', error);
-                throw error;
+                throw new Error(error.message);
             }
             
-            await customAlert('User promoted to admin successfully!', 'Success');
-        } else {
-            // Remove from admins table
-            const { data, error } = await supabaseClient
-                .from('admins')
-                .delete()
-                .eq('user_id', userId)
-                .select();
+            if (!data.success) {
+                await customAlert(data.error || 'Failed to promote user', 'Error');
+                return;
+            }
             
-            console.log('Delete result:', { data, error });
+            await customAlert(data.message || 'User promoted to admin successfully!', 'Success');
+        } else {
+            // Call database function to demote user
+            const { data, error } = await supabaseClient
+                .rpc('demote_from_admin', { target_user_id: userId });
+            
+            console.log('Demote result:', { data, error });
             
             if (error) {
                 console.error('Error demoting from admin:', error);
-                throw error;
+                throw new Error(error.message);
             }
             
-            await customAlert('User demoted to standard user.', 'Success');
+            if (!data.success) {
+                await customAlert(data.error || 'Failed to demote user', 'Error');
+                return;
+            }
+            
+            await customAlert(data.message || 'User demoted to standard user.', 'Success');
         }
         
         // Reload users
